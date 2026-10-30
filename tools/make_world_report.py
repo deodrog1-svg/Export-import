@@ -94,6 +94,11 @@ def P(t, s="body"):
     return Paragraph(t, S[s])
 
 
+def pct(x):
+    s = f"{x:.0%}"
+    return "0%" if s == "-0%" else s.replace("-", "−")
+
+
 def usd(x, dec=0):
     s = f"{abs(x):,.{dec}f}"
     return f"−${s}" if x < 0 else f"${s}"
@@ -246,7 +251,7 @@ def section(kicker, title, lead=None):
 def bar_chart(rows, width):
     """Horizontal bars: delivered cost per tonne (1,000 t), colored by status, sale line."""
     data = [r for r in rows if r["lots"]]
-    bar_h, gap, left, right_pad, top = 4.6 * mm, 2.2 * mm, 34 * mm, 26 * mm, 8 * mm
+    bar_h, gap, left, right_pad, top = 3.4 * mm, 1.5 * mm, 40 * mm, 16 * mm, 8 * mm
     height = top + len(data) * (bar_h + gap) + 10 * mm
     d = Drawing(width, height)
     vmax = max(max(r["lots"][1000]["cost_per_unit"] for r in data), SALE_PRICE) * 1.05
@@ -305,7 +310,7 @@ def ranking_table(rows):
             a, b = r["lots"][100], r["lots"][1000]
             nums = [f"{c['transit_days']:g}", usd(c["buy_price_usd_t"]),
                     usd(c["freight_per_20ft_usd"] / CONTAINER_T), usd(a["cost_per_unit"]),
-                    f"<b>{usd(b['cost_per_unit'])}</b>", f"{b['margin']:.0%}"]
+                    f"<b>{usd(b['cost_per_unit'])}</b>", pct(b["margin"])]
         else:
             nums = [f"{c.get('transit_days') or 0:g}", "n/a", "-", "-", "-", "-"]
         data.append([P(str(i), "cell"), P(f"<b>{c['country']}</b>", "cell"), pill(c["status"]),
@@ -399,8 +404,8 @@ def build(src, out):
     importable = [r for r in rows if r["lots"] and r["c"]["status"] == "open"]
     best = importable[0] if importable else None
     best_cis = next((r for r in importable if r["c"].get("cis")), None)
-    n_open = sum(1 for r in rows if r["c"]["status"] == "open")
-    n_total = sum(1 for r in rows if r["c"]["status"] != "benchmark")
+    n_open = sum(1 for r in rows if r["c"]["status"] == "open" and r["lots"])
+    n_total = sum(1 for r in rows if r["c"]["status"] != "benchmark" and r["lots"])
 
     doc = BaseDocTemplate(out, pagesize=A4, title="Sulphur to South Korea: delivered cost by country",
                           author="Trade Advisor", leftMargin=M, rightMargin=M,
@@ -436,7 +441,7 @@ def build(src, out):
     if bench:
         summary.append(f"<b>Korean domestic benchmark ({bench['c']['country']}):</b> "
                        f"{usd(bench['lots'][1000]['cost_per_unit'])}/t, which is what your clients can already get locally.")
-    summary.append(f"Only <b>{n_open} of {n_total}</b> source countries are open; the rest are under export bans, "
+    summary.append(f"Only <b>{n_open} of {n_total}</b> priced source countries are open; the rest are under export bans, "
                    "sanctions or shipping disruption (marked in grey in the tables).")
     story.append(callout("<br/><br/>".join(summary)))
     story.append(Spacer(1, 10))
@@ -465,7 +470,7 @@ def build(src, out):
     method = [
         f"Lot sizes {', '.join(f'{q:,} t' for q in LOTS)}; 20ft containers of {CONTAINER_T} t bagged sulphur.",
         f"Origin: export documents, certificate of origin and broker ${DOCS:,} per shipment; bagging ${BAGGING}/t.",
-        "Insurance 0.3% of (FOB + freight) × 110%. Korean duty on CIF at the country's rate (FTA or 2% basic).",
+        "Insurance 0.3% of (FOB + freight) × 110%. Korean duty on CIF: 0% WTO rate for WTO members and FTA partners; 2% basic rate for non-WTO origins (UZ, TM, AZ, BY, IR, IQ).",
         f"Korea: Busan THC/D-O + hazmat-licensed truck ${DEST_PER_CONTAINER} per container; customs broker + "
         f"chemical confirmation ${BROKER_KR} per shipment. VAT 10% recoverable, so excluded from cost.",
         "Financing 8%/yr on landed cost over transit + 30 days payment terms; FX buffer 1%.",
