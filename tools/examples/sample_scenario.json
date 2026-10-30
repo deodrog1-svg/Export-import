@@ -1,0 +1,95 @@
+{
+  "_comment": "ILLUSTRATIVE NUMBERS ONLY - not verified rates. The agent replaces these with researched, dated figures.",
+  "product": {
+    "description": "Cotton T-shirts, knitted",
+    "hs_code": "6109.10",
+    "origin": "VN"
+  },
+  "currency": "USD",
+  "quantity": 10000,
+  "unit_cost": 3.20,
+  "sale_price_per_unit": 7.50,
+  "financing_rate_annual": 0.09,
+  "routes": [
+    {
+      "name": "VN->DE sea FCL via Hamburg, FTA rate",
+      "mode": "sea",
+      "destination": "DE",
+      "incoterm": "FOB Hai Phong",
+      "origin_charges": [{"name": "Export clearance + THC", "amount": 450}],
+      "freight": 2800,
+      "insurance_rate": 0.004,
+      "duty_basis": "CIF",
+      "duty_rate": 0.0,
+      "vat_rate": 0.19,
+      "vat_recoverable": true,
+      "destination_charges": [
+        {"name": "THC + delivery order", "amount": 520},
+        {"name": "Customs broker", "amount": 180},
+        {"name": "Inland trucking", "amount": 650}
+      ],
+      "transit_days": 35,
+      "payment_terms_days": 30,
+      "fx_buffer_rate": 0.01,
+      "notes": "Preferential rate requires EUR.1 / statement on origin; confirm current staging."
+    },
+    {
+      "name": "VN->DE sea FCL, MFN rate (no origin proof)",
+      "mode": "sea",
+      "destination": "DE",
+      "origin_charges": [{"name": "Export clearance + THC", "amount": 450}],
+      "freight": 2800,
+      "insurance_rate": 0.004,
+      "duty_basis": "CIF",
+      "duty_rate": 0.12,
+      "vat_rate": 0.19,
+      "destination_charges": [
+        {"name": "THC + delivery order", "amount": 520},
+        {"name": "Customs broker", "amount": 180},
+        {"name": "Inland trucking", "amount": 650}
+      ],
+      "transit_days": 35,
+      "payment_terms_days": 30,
+      "fx_buffer_rate": 0.01
+    },
+    {
+      "name": "VN->US sea FCL via Long Beach",
+      "mode": "sea",
+      "destination": "US",
+      "sale_price_per_unit": 8.00,
+      "origin_charges": [{"name": "Export clearance + THC", "amount": 450}],
+      "freight": 3400,
+      "insurance_rate": 0.004,
+      "duty_basis": "FOB",
+      "duty_rate": 0.165,
+      "additional_duty_rate": 0.0,
+      "vat_rate": 0.0,
+      "destination_charges": [
+        {"name": "THC + chassis", "amount": 600},
+        {"name": "Customs broker + ISF", "amount": 250},
+        {"name": "MPF + HMF", "amount": 120}
+      ],
+      "transit_days": 22,
+      "payment_terms_days": 30,
+      "fx_buffer_rate": 0.0
+    },
+    {
+      "name": "VN->DE air freight, FTA rate",
+      "mode": "air",
+      "destination": "DE",
+      "origin_charges": [{"name": "Export clearance + handling", "amount": 300}],
+      "freight": 9500,
+      "insurance_rate": 0.003,
+      "duty_basis": "CIF",
+      "duty_rate": 0.0,
+      "vat_rate": 0.19,
+      "destination_charges": [
+        {"name": "Airport handling", "amount": 350},
+        {"name": "Customs broker", "amount": 180}
+      ],
+      "transit_days": 5,
+      "payment_terms_days": 30,
+      "fx_buffer_rate": 0.01
+    }
+  ]
+}
