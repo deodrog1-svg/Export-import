@@ -28,3 +28,4 @@ reads this first in every session and adds a line for every file it creates.
 ## Sessions
 - [sessions/2026-10-30-sulphur-cis-korea.md](sessions/2026-10-30-sulphur-cis-korea.md): sulphur CIS -> Korea, route & profit comparison
 - [sessions/2026-10-30-sulphur-lot-sizes.md](sessions/2026-10-30-sulphur-lot-sizes.md): 1/10/100 t cost comparison incl. Kyrgyzstan, Uzbekistan
+- [sessions/2026-10-30-sulphur-profitability.md](sessions/2026-10-30-sulphur-profitability.md): tonnage vs buy price profit grid, bulk vs containers
