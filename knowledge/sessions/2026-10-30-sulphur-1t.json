@@ -1,0 +1,125 @@
+{
+ "_comment": "ESTIMATES 2026-10-30; replace with real quotes",
+ "product": {
+  "description": "Sulphur HS 2503, 1 t lot"
+ },
+ "currency": "USD",
+ "quantity": 1,
+ "unit_cost": 0,
+ "sale_price_per_unit": 1100,
+ "financing_rate_annual": 0.08,
+ "routes": [
+  {
+   "name": "TM: Turkmenistan (SCRMET) -> rail UZ/KZ -> Altynkol -> Lianyungang -> Busan",
+   "unit_cost": 900,
+   "mode": "rail+sea",
+   "origin_charges": [
+    {
+     "name": "Export docs, CO, broker",
+     "amount": 500
+    }
+   ],
+   "freight": 480,
+   "duty_basis": "CIF",
+   "duty_rate": 0.02,
+   "vat_rate": 0.1,
+   "destination_charges": [
+    {
+     "name": "Broker",
+     "amount": 200
+    },
+    {
+     "name": "CFS/D-O",
+     "amount": 150
+    },
+    {
+     "name": "Chem confirmation",
+     "amount": 100
+    },
+    {
+     "name": "Hazmat delivery",
+     "amount": 250
+    }
+   ],
+   "transit_days": 40,
+   "payment_terms_days": 30,
+   "fx_buffer_rate": 0.01,
+   "insurance": 50
+  },
+  {
+   "name": "UZ: Uzbekistan (Mubarek) -> rail KZ -> Altynkol -> Lianyungang -> Busan",
+   "unit_cost": 900,
+   "mode": "rail+sea",
+   "origin_charges": [
+    {
+     "name": "Export docs, CO, broker",
+     "amount": 500
+    }
+   ],
+   "freight": 450,
+   "duty_basis": "CIF",
+   "duty_rate": 0.02,
+   "vat_rate": 0.1,
+   "destination_charges": [
+    {
+     "name": "Broker",
+     "amount": 200
+    },
+    {
+     "name": "CFS/D-O",
+     "amount": 150
+    },
+    {
+     "name": "Chem confirmation",
+     "amount": 100
+    },
+    {
+     "name": "Hazmat delivery",
+     "amount": 250
+    }
+   ],
+   "transit_days": 38,
+   "payment_terms_days": 30,
+   "fx_buffer_rate": 0.01,
+   "insurance": 50
+  },
+  {
+   "name": "KG: Kyrgyzstan (trader) -> truck Torugart -> Kashgar -> rail -> Lianyungang -> Busan",
+   "unit_cost": 950,
+   "mode": "rail+sea",
+   "origin_charges": [
+    {
+     "name": "Export docs, CO, broker",
+     "amount": 500
+    }
+   ],
+   "freight": 520,
+   "duty_basis": "CIF",
+   "duty_rate": 0.02,
+   "vat_rate": 0.1,
+   "destination_charges": [
+    {
+     "name": "Broker",
+     "amount": 200
+    },
+    {
+     "name": "CFS/D-O",
+     "amount": 150
+    },
+    {
+     "name": "Chem confirmation",
+     "amount": 100
+    },
+    {
+     "name": "Hazmat delivery",
+     "amount": 250
+    }
+   ],
+   "transit_days": 46,
+   "payment_terms_days": 30,
+   "fx_buffer_rate": 0.01,
+   "insurance": 50,
+   "notes": "Kyrgyzstan has no production: stock is Kazakh-origin. Re-exporting it while KZ ban is in force = high legal risk."
+  }
+ ]
+}
