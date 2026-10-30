@@ -1,0 +1,44 @@
+{
+  "_comment": "ESTIMATES for a 1,000 t trial. Purchase prices, freight and sale price are assumptions derived from Oct 2026 benchmarks (ME FOB ~$740-890/t, CFR China ~$800-965/t); replace with real quotes.",
+  "product": {"description": "Sulphur, lump/granular technical (HS 2503.00)", "hs_code": "2503.00"},
+  "currency": "USD",
+  "quantity": 1000,
+  "unit_cost": 650,
+  "sale_price_per_unit": 900,
+  "financing_rate_annual": 0.08,
+  "routes": [
+    {
+      "name": "A. Turkmenistan -> rail via KZ/Khorgos -> Lianyungang -> Busan (containers)",
+      "mode": "rail+sea",
+      "origin_charges": [{"name": "Exchange fees, bagging, container stuffing", "amount": 25000}],
+      "freight": 145000,
+      "insurance_rate": 0.003,
+      "duty_basis": "CIF", "duty_rate": 0.02, "vat_rate": 0.10,
+      "destination_charges": [{"name": "Busan THC, broker, chem confirmation, hazmat trucking", "amount": 30000}],
+      "other_fees": [{"name": "Setup per first shipment: K-REACH access/OR, permits, legal", "amount": 10000}],
+      "transit_days": 30, "payment_terms_days": 30, "fx_buffer_rate": 0.01
+    },
+    {
+      "name": "B. Turkmenistan -> Caspian -> Poti -> sea via Suez -> Busan",
+      "mode": "rail+ferry+sea",
+      "origin_charges": [{"name": "Exchange fees, bagging", "amount": 20000}],
+      "freight": 230000,
+      "insurance_rate": 0.005,
+      "duty_basis": "CIF", "duty_rate": 0.02, "vat_rate": 0.10,
+      "destination_charges": [{"name": "Busan THC, broker, chem confirmation, hazmat trucking", "amount": 30000}],
+      "other_fees": [{"name": "Setup per first shipment", "amount": 10000}],
+      "transit_days": 55, "payment_terms_days": 30, "fx_buffer_rate": 0.01
+    },
+    {
+      "name": "C. Kazakhstan (Tengiz) -> Altynkol -> Lianyungang -> Busan [BLOCKED until KZ ban lifts]",
+      "mode": "rail+sea",
+      "origin_charges": [{"name": "Bagging, container stuffing", "amount": 20000}],
+      "freight": 135000,
+      "insurance_rate": 0.003,
+      "duty_basis": "CIF", "duty_rate": 0.02, "vat_rate": 0.10,
+      "destination_charges": [{"name": "Busan THC, broker, chem confirmation, hazmat trucking", "amount": 30000}],
+      "other_fees": [{"name": "Setup per first shipment", "amount": 10000}],
+      "transit_days": 28, "payment_terms_days": 30, "fx_buffer_rate": 0.01
+    }
+  ]
+}

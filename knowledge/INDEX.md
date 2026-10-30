@@ -10,13 +10,16 @@ reads this first in every session and adds a line for every file it creates.
 - [sources.md](sources.md): trusted official sources by topic and country
 
 ## Countries
-_(none yet: files go in countries/ as `<ISO2>-<name>.md`)_
+- [countries/KR-south-korea.md](countries/KR-south-korea.md): Korea import setup, visas, VAT
+- [countries/KZ-kazakhstan.md](countries/KZ-kazakhstan.md): KZ sulphur export suspension (Jun 2026)
+- [countries/RU-russia.md](countries/RU-russia.md): RU sulphur export ban to end-2026
+- [countries/TM-turkmenistan.md](countries/TM-turkmenistan.md): Turkmen sulphur via commodity exchange
 
 ## Products
-_(none yet: files go in products/ as `<HS6>-<short-name>.md`)_
+- [products/250300-sulphur.md](products/250300-sulphur.md): sulphur, Korea rules, 2026 prices
 
 ## Routes
-_(none yet: files go in routes/ as `<ORIGIN>-<DEST>-<mode>.md`)_
+- [routes/TM-KR-rail-sea.md](routes/TM-KR-rail-sea.md): Turkmenistan -> Korea via Kazakhstan/China
 
 ## Sessions
-_(none yet: files go in sessions/ as `YYYY-MM-DD-<topic>.md`)_
+- [sessions/2026-10-30-sulphur-cis-korea.md](sessions/2026-10-30-sulphur-cis-korea.md): sulphur CIS -> Korea, route & profit comparison

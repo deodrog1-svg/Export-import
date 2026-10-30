@@ -2,10 +2,10 @@
 
 The agent fills this in as it learns about the business. Edit freely.
 
-- **Company / role:** _unknown_ (exporter, importer, trader, or all)
-- **Home country:** _unknown_
-- **Products of interest:** _unknown_
-- **Target markets:** _unknown_
+- **Company / role:** individual trader / importer, starting out (2026-10-30)
+- **Home country:** citizen of Kazakhstan, resident in South Korea (visa type: _unknown, ask_)
+- **Products of interest:** sulphur (сера), HS 2503
+- **Target markets:** South Korea (has client leads); sources: CIS (KZ, RU, TM)
 - **Typical order size:** _unknown_
 - **Reporting currency:** USD (default until told otherwise)
 - **Preferred Incoterms:** _unknown_
