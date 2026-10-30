@@ -144,6 +144,24 @@ def evaluate(countries):
     return priced + [r for r in rows if not r["lots"]]
 
 
+ALT_PRICE = 950  # second sale-price case shown in the profit tables
+YEAR_T = 12 * 1000  # one 1,000 t shipment per month
+
+
+def profit(r, q, price=SALE_PRICE):
+    """Gross profit on a q-tonne lot at a given delivered sale price."""
+    return price * q - r["lots"][q]["total_cost"]
+
+
+def price_for_margin(r, margin=0.10):
+    return r["lots"][1000]["cost_per_unit"] / (1 - margin)
+
+
+def ranked_by_profit(rows):
+    open_rows = [r for r in rows if r["lots"] and r["c"]["status"] == "open"]
+    return sorted(open_rows, key=lambda r: profit(r, 1000), reverse=True)
+
+
 # ---------------------------------------------------------------- page chrome
 
 def cover(canvas, doc):
@@ -346,9 +364,12 @@ def breakdown_table(r):
     ]
     data = [[P(k, "card"), P(usd(v / q), "cellr")] for k, v in lines]
     data.append([P("<b>Delivered</b>", "card"), P(f"<b>{usd(x['cost_per_unit'])}</b>", "cellr")])
+    data.append([P(f"<b>Profit 100 t</b> @${SALE_PRICE}", "card"), P(f"<b>{usd(profit(r, 100))}</b>", "cellr")])
+    data.append([P(f"<b>Profit 1,000 t</b> @${SALE_PRICE}", "card"), P(f"<b>{usd(profit(r, 1000))}</b>", "cellr")])
     t = Table(data, colWidths=[31 * mm, 17 * mm])
     t.setStyle(TableStyle([
-        ("LINEABOVE", (0, -1), (-1, -1), 0.8, GOLD),
+        ("LINEABOVE", (0, -3), (-1, -3), 0.8, GOLD),
+        ("LINEABOVE", (0, -2), (-1, -2), 0.4, HAIR),
         ("TOPPADDING", (0, 0), (-1, -1), 1.2), ("BOTTOMPADDING", (0, 0), (-1, -1), 1.2),
         ("LEFTPADDING", (0, 0), (-1, -1), 0), ("RIGHTPADDING", (0, 0), (-1, -1), 0),
     ]))
@@ -383,6 +404,101 @@ def card(r, width):
     return KeepTogether([t, Spacer(1, 5)])
 
 
+def profit_table(rows):
+    head = ["Country", "Route to Busan", "Days", "Profit $/t", "100 t", "1,000 t",
+            f"1,000 t @${ALT_PRICE}", "Per year*", "Price for 10%"]
+    data = [[P(h, "headr" if i >= 2 else "head") for i, h in enumerate(head)]]
+    styles = []
+    for i, r in enumerate([r for r in rows if r["lots"]], 1):
+        c = r["c"]
+        p1k = profit(r, 1000)
+        cells = [P(f"<b>{c['country']}</b>", "cell"), P(c.get("route", ""), "cell")]
+        nums = [f"{c['transit_days']:g}", usd(p1k / 1000), usd(profit(r, 100)), f"<b>{usd(p1k)}</b>",
+                usd(profit(r, 1000, ALT_PRICE)), usd(p1k * YEAR_T / 1000), usd(price_for_margin(r))]
+        if c["status"] not in ("open", "benchmark"):
+            nums[1:7] = [f"<font color='#8C95A1'>{n}</font>" for n in nums[1:7]]
+            cells[0] = P(f"<b>{c['country']}</b><br/><font size=6 color='#D03B3B'>{STATUS.get(c['status'], ('', c['status'].upper()))[1]}</font>", "cell")
+            styles.append(("TEXTCOLOR", (0, i), (-1, i), INK_3))
+        data.append(cells + [P(n, "cellr") for n in nums])
+        color = colors.HexColor("#0CA30C") if p1k > 0 else colors.HexColor("#D03B3B")
+        styles.append(("LINEBEFORE", (0, i), (0, i), 2, color))
+    widths = [24, 39, 10, 13, 16, 19, 19, 22, 16]
+    t = Table(data, colWidths=[w * mm for w in widths], repeatRows=1)
+    t.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), NAVY),
+        ("LINEBELOW", (0, 0), (-1, 0), 1, GOLD),
+        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, ROW]),
+        ("LINEBELOW", (0, 1), (-1, -1), 0.3, HAIR),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("TOPPADDING", (0, 0), (-1, -1), 3), ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+        ("LEFTPADDING", (0, 0), (-1, -1), 3), ("RIGHTPADDING", (0, 0), (-1, -1), 3),
+    ] + styles))
+    return t
+
+
+def route_steps(route, width):
+    """Route string 'A -> B -> C' as a row of numbered step chips."""
+    steps = [s.strip() for s in route.replace("→", "->").split("->") if s.strip()]
+    cells = []
+    for i, s_ in enumerate(steps, 1):
+        cells.append(P(f"<font color='#C9A45C'><b>{i}</b></font>&nbsp; {s_}", "card"))
+    n = len(cells)
+    t = Table([cells], colWidths=[width / n] * n)
+    t.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), ROW),
+        ("LINEAFTER", (0, 0), (-2, -1), 1.5, PAPER),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("TOPPADDING", (0, 0), (-1, -1), 4), ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+        ("LEFTPADDING", (0, 0), (-1, -1), 5), ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+    ]))
+    return t
+
+
+def stat(label, value, sub=""):
+    return [P(f"<font size=6.5 color='#8C95A1'><b>{label.upper()}</b></font>", "card"),
+            Paragraph(f"<font size=13><b>{value}</b></font>", st("v", fontName="DV-B", fontSize=13, leading=16, textColor=NAVY)),
+            P(f"<font color='#5A6472'>{sub}</font>", "small")]
+
+
+def top_card(rank, r, width):
+    c = r["c"]
+    b = r["lots"][1000]
+    badge = Table([[Paragraph(f"<font color='#0E1B2C'><b>{rank}</b></font>",
+                      st("bd", fontName="DV-B", fontSize=16, leading=18, alignment=1))]],
+                  colWidths=[11 * mm], rowHeights=[11 * mm])
+    badge.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), GOLD), ("ROUNDEDCORNERS", [3, 3, 3, 3]),
+                               ("VALIGN", (0, 0), (-1, -1), "MIDDLE")]))
+    title = Table([[badge, [Paragraph(c["country"], st("tt", fontName="DV-B", fontSize=14, leading=17, textColor=NAVY)),
+                            P(f"<font color='#5A6472'>{c.get('origin_point', '')} · {c.get('mode', '')} · "
+                              f"~{c.get('transit_days', 0):g} days to Busan</font>", "small")],
+                    pill(c["status"])]],
+                  colWidths=[14 * mm, width - 14 * mm - 22 * mm, 20 * mm])
+    title.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("LEFTPADDING", (0, 0), (-1, -1), 0)]))
+    inner_w = width - 14 * mm
+    stats = Table([[stat("Delivered cost", f"{usd(b['cost_per_unit'])}/t", "1,000 t lot"),
+                    stat("Profit 100 t", usd(profit(r, 100)), f"at ${SALE_PRICE}/t"),
+                    stat("Profit 1,000 t", usd(profit(r, 1000)), f"{b['margin']:.1%} margin at ${SALE_PRICE}/t"),
+                    stat(f"Profit at ${ALT_PRICE}", usd(profit(r, 1000, ALT_PRICE)), "1,000 t lot"),
+                    stat("Per year", usd(profit(r, 1000) * YEAR_T / 1000), "1,000 t every month")]],
+                  colWidths=[inner_w / 5] * 5)
+    stats.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"), ("LEFTPADDING", (0, 0), (-1, -1), 0),
+                               ("LINEAFTER", (0, 0), (-2, -1), 0.4, HAIR)]))
+    body = [title, Spacer(1, 6), P("<b>ROUTE</b>", "kicker"), route_steps(c.get("route", ""), inner_w),
+            Spacer(1, 7), stats, Spacer(1, 6),
+            P(f"<b>Watch:</b> <font color='#5A6472'>{c.get('status_note', '')}</font> "
+              f"Client must pay ≥ <b>{usd(price_for_margin(r))}/t</b> for a 10% margin. "
+              f"Data confidence: {c.get('confidence', '-')}.", "card")]
+    t = Table([[body]], colWidths=[width])
+    t.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, -1), colors.white),
+        ("BOX", (0, 0), (-1, -1), 0.4, HAIR),
+        ("LINEABOVE", (0, 0), (-1, 0), 2.2, GOLD),
+        ("TOPPADDING", (0, 0), (-1, -1), 8), ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+        ("LEFTPADDING", (0, 0), (-1, -1), 7), ("RIGHTPADDING", (0, 0), (-1, -1), 7),
+    ]))
+    return KeepTogether([t, Spacer(1, 7)])
+
+
 def callout(text):
     t = Table([[P(text, "body")]], colWidths=[W - 2 * M])
     t.setStyle(TableStyle([
@@ -411,8 +527,8 @@ def build(src, out):
                           author="Trade Advisor", leftMargin=M, rightMargin=M,
                           topMargin=18 * mm, bottomMargin=18 * mm)
     doc.kpis = [
-        ("Cheapest open source", best["c"]["country"] if best else "-",
-         f"{usd(best['lots'][1000]['cost_per_unit'])}/t delivered\n1,000 t lot" if best else ""),
+        ("Most profitable source", best["c"]["country"] if best else "-",
+         f"{usd(profit(best, 1000))} profit on 1,000 t\n{usd(best['lots'][1000]['cost_per_unit'])}/t delivered" if best else ""),
         ("Best CIS source", best_cis["c"]["country"] if best_cis else "-",
          f"{usd(best_cis['lots'][1000]['cost_per_unit'])}/t delivered\n1,000 t lot" if best_cis else ""),
         ("Countries open now", f"{n_open} of {n_total}", "others banned, sanctioned\nor disrupted (Oct 2026)"),
@@ -437,6 +553,9 @@ def build(src, out):
         b = best_cis["lots"][1000]
         summary.append(f"<b>Best CIS source: {best_cis['c']['country']}</b> at <b>{usd(b['cost_per_unit'])}/t</b> "
                        f"({b['margin']:.0%} margin).")
+    top3 = ranked_by_profit(rows)[:3]
+    summary.append("<b>Top 3 by profit (1,000 t):</b> " + " · ".join(
+        f"{i}. {r['c']['country']} {usd(profit(r, 1000))}" for i, r in enumerate(top3, 1)) + ". Details in section 03.")
     bench = next((r for r in rows if r["c"]["status"] == "benchmark" and r["lots"]), None)
     if bench:
         summary.append(f"<b>Korean domestic benchmark ({bench['c']['country']}):</b> "
@@ -453,20 +572,42 @@ def build(src, out):
     story.append(Spacer(1, 3))
     story.append(legend())
 
+    top = ranked_by_profit(rows)[:3]
     story.append(PageBreak())
-    story += section("03 · Ranking", "Every country, ranked by delivered cost",
+    story += section("03 · Top 3", "The three most profitable countries and routes",
+                     f"Ranked by gross profit on a 1,000 t lot sold at ${SALE_PRICE}/t delivered, only among countries "
+                     f"that can legally export today. ‘Per year’ assumes 1,000 t every month at the same prices.")
+    for i, r in enumerate(top, 1):
+        story.append(top_card(i, r, W - 2 * M))
+    if best_cis and best_cis not in top:
+        bc = best_cis
+        story.append(callout(
+            f"<b>Best CIS option: {bc['c']['country']}</b> ({bc['c'].get('route', '')}). Delivered "
+            f"{usd(bc['lots'][1000]['cost_per_unit'])}/t: profit {usd(profit(bc, 1000))} on 1,000 t at ${SALE_PRICE}/t, "
+            f"{usd(profit(bc, 1000, ALT_PRICE))} at ${ALT_PRICE}/t. Client must pay ≥ {usd(price_for_margin(bc))}/t "
+            f"for a 10% margin."))
+
+    story.append(PageBreak())
+    story += section("04 · Ranking", "Every country, ranked by delivered cost",
                      "Cost per tonne delivered to the client in Korea, ex-VAT (VAT is recoverable). "
                      f"*Margin at 1,000 t and an assumed sale price of ${SALE_PRICE}/t.")
     story.append(ranking_table(rows))
 
     story.append(PageBreak())
-    story += section("04 · Country profiles", "Route, status and cost stack per country",
-                     "Cost stack per tonne at 1,000 t. The coloured edge shows the export status.")
+    story += section("05 · Profit", "How much you make from every country",
+                     f"Gross profit after all costs (purchase, freight, duty, port, delivery, financing, FX) at a "
+                     f"delivered sale price of ${SALE_PRICE}/t, plus the ${ALT_PRICE}/t case. *Per year = 1,000 t every month. "
+                     "‘Price for 10%’ = what the client must pay per tonne for a 10% margin. Grey rows cannot export today.")
+    story.append(profit_table(rows))
+
+    story.append(PageBreak())
+    story += section("06 · Country profiles", "Route, status, cost stack and profit per country",
+                     f"Cost stack per tonne at 1,000 t and profit at ${SALE_PRICE}/t. The coloured edge shows the export status.")
     for r in rows:
         story.append(card(r, W - 2 * M))
 
     story.append(PageBreak())
-    story += section("05 · Method & sources", "How the numbers were built")
+    story += section("07 · Method & sources", "How the numbers were built")
     method = [
         f"Lot sizes {', '.join(f'{q:,} t' for q in LOTS)}; 20ft containers of {CONTAINER_T} t bagged sulphur.",
         f"Origin: export documents, certificate of origin and broker ${DOCS:,} per shipment; bagging ${BAGGING}/t.",
